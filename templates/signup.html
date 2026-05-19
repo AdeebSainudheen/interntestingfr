@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup | Portfolio</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="{% url 'home' %}" class="logo">Portfolio</a>
+            <nav class="nav-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'login' %}">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="form-page">
+        <section class="container">
+            <form class="auth-form" method="post" novalidate>
+                {% csrf_token %}
+                <h2>Sign Up</h2>
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="message {{ message.tags }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+                {{ form.non_field_errors }}
+
+                <label for="id_username">Username</label>
+                {{ form.username }}
+
+                <label for="id_password1">Password</label>
+                {{ form.password1 }}
+
+                <label for="id_password2">Confirm Password</label>
+                {{ form.password2 }}
+
+                <button type="submit" class="btn">Create account</button>
+
+                <div class="form-footer">
+                    <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
