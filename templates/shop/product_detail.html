@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{{ product.name }}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="/" class="logo">Store</a>
+        <nav class="nav-links">
+            <a href="/">Home</a>
+            <a href="/shop/">Shop</a>
+            <a href="{% url 'siteapp:cart' %}">Cart</a>
+        </nav>
+    </div>
+</header>
+<main class="container">
+    <section class="product-detail">
+        <div>
+            {% if product.image_url %}
+            <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            {% else %}
+            <img src="{% static 'css/placeholder.png' %}" alt="{{ product.name }}">
+            {% endif %}
+        </div>
+        <div class="meta">
+            <h1>{{ product.name }}</h1>
+            <p class="price">${{ product.price }}</p>
+            <p>{{ product.description }}</p>
+            <form action="{% url 'siteapp:add_to_cart' product.pk %}" method="post">
+                {% csrf_token %}
+                <label>Quantity</label>
+                <input type="number" name="quantity" value="1" min="1" style="width:80px;padding:8px;margin:8px 0;border-radius:8px;border:1px solid #e5e7eb;">
+                <button class="btn" type="submit">Add to Bag</button>
+            </form>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container">© 2026 Store</div>
+</footer>
+</body>
+</html>

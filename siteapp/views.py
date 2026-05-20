@@ -1,7 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
+
+from .models import Product
 
 
 def home(request):
@@ -65,3 +67,51 @@ def logout_view(request):
     logout(request)
     messages.info(request, 'You have been logged out.')
     return redirect('home')
+
+
+def product_list(request):
+    products = Product.objects.filter(available=True)
+    return render(request, 'shop/product_list.html', {'products': products})
+
+
+def product_detail(request, slug):
+    product = get_object_or_404(Product, slug=slug, available=True)
+    return render(request, 'shop/product_detail.html', {'product': product})
+
+
+def _get_cart(request):
+    return request.session.get('cart', {})
+
+
+def cart_view(request):
+    cart = _get_cart(request)
+    items = []
+    total = 0
+    for pid_str, qty in cart.items():
+        try:
+            pid = int(pid_str)
+            product = Product.objects.get(pk=pid)
+        except (Product.DoesNotExist, ValueError):
+            continue
+        subtotal = product.price * qty
+        total += subtotal
+        items.append({'product': product, 'quantity': qty, 'subtotal': subtotal})
+    return render(request, 'shop/cart.html', {'items': items, 'total': total})
+
+
+def add_to_cart(request, pk):
+    cart = request.session.get('cart', {})
+    key = str(pk)
+    qty = int(request.POST.get('quantity', 1)) if request.method == 'POST' else 1
+    cart[key] = cart.get(key, 0) + qty
+    request.session['cart'] = cart
+    messages.success(request, 'Added to cart.')
+    return redirect('cart')
+
+
+def remove_from_cart(request, pk):
+    cart = request.session.get('cart', {})
+    cart.pop(str(pk), None)
+    request.session['cart'] = cart
+    messages.info(request, 'Removed from cart.')
+    return redirect('cart')

@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Your Bag</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a href="/" class="logo">Store</a>
+        <nav class="nav-links">
+            <a href="/">Home</a>
+            <a href="/shop/">Shop</a>
+            <a href="{% url 'siteapp:cart' %}">Cart</a>
+        </nav>
+    </div>
+</header>
+<main class="container">
+    <section class="section">
+        <h1>Your Bag</h1>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;">
+            <div class="cart-list">
+                {% for item in items %}
+                <div class="cart-item">
+                    <div style="flex:1;">
+                        <strong>{{ item.product.name }}</strong>
+                        <div>${{ item.product.price }} × {{ item.quantity }}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div>${{ item.subtotal }}</div>
+                        <form action="{% url 'siteapp:remove_from_cart' item.product.pk %}" method="post">
+                            {% csrf_token %}
+                            <button class="btn secondary" type="submit">Remove</button>
+                        </form>
+                    </div>
+                </div>
+                {% empty %}
+                <p>Your bag is empty.</p>
+                {% endfor %}
+            </div>
+            <aside class="cart-summary">
+                <h3>Order Summary</h3>
+                <p><strong>Total:</strong> ${{ total }}</p>
+                <button class="btn">Checkout</button>
+            </aside>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="container">© 2026 Store</div>
+</footer>
+</body>
+</html>
